@@ -65,8 +65,6 @@ def model_and_diffusion_defaults():
         use_new_attention_order=False,
         dpm_solver = False,
         version = 'new',
-        activation_function = nn.SiLU,
-        final_nonlin = sigmoid_helper,
     )
     res.update(diffusion_defaults())
     return res
