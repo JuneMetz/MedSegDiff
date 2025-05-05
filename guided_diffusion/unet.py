@@ -538,6 +538,7 @@ class UNetModel_v1preview(nn.Module):
         use_new_attention_order=False,
         high_way = True,
         activation_function = nn.SiLU,
+        final_nonlin = sigmoid_helper
     ):
         super().__init__()
 
@@ -725,7 +726,7 @@ class UNetModel_v1preview(nn.Module):
 
         if high_way:
             features = 32
-            self.hwm = Generic_UNet(self.in_channels - 1, features, 1, 5, highway=True)
+            self.hwm = Generic_UNet(self.in_channels - 1, features, 1, 5, highway=True, final_nonlin = final_nonlin)
 
     def convert_to_fp16(self):
         """
@@ -854,6 +855,7 @@ class UNetModel_newpreview(nn.Module):
         use_new_attention_order=False,
         high_way = True,
         activation_function = nn.SiLU,
+        final_nonlin = sigmoid_helper,
     ):
         super().__init__()
 
@@ -1041,7 +1043,7 @@ class UNetModel_newpreview(nn.Module):
 
         if high_way:
             features = 32
-            self.hwm = Generic_UNet(self.in_channels - 1, features, 1, 5, anchor_out=True, upscale_logits=True)
+            self.hwm = Generic_UNet(self.in_channels - 1, features, 1, 5, anchor_out=True, upscale_logits=True, final_nonlin = final_nonlin)
 
     def convert_to_fp16(self):
         """
