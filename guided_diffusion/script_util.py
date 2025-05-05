@@ -63,6 +63,7 @@ def model_and_diffusion_defaults():
         use_new_attention_order=False,
         dpm_solver = False,
         version = 'new',
+        activation_function = nn.SiLU,
     )
     res.update(diffusion_defaults())
     return res
