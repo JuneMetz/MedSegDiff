@@ -234,6 +234,7 @@ class ResBlock(TimestepBlock):
         use_checkpoint=False,
         up=False,
         down=False,
+        activation_function=nn.SiLU,
     ):
         super().__init__()
         self.channels = channels
@@ -246,7 +247,7 @@ class ResBlock(TimestepBlock):
 
         self.in_layers = nn.Sequential(
             normalization(channels),
-            nn.SiLU(),
+            activation_function(),
             conv_nd(dims, channels, self.out_channels, 3, padding=1),
         )
 
@@ -262,7 +263,7 @@ class ResBlock(TimestepBlock):
             self.h_upd = self.x_upd = nn.Identity()
 
         self.emb_layers = nn.Sequential(
-            nn.SiLU(),
+            activation_function(),
             linear(
                 emb_channels,
                 2 * self.out_channels if use_scale_shift_norm else self.out_channels,
@@ -270,7 +271,7 @@ class ResBlock(TimestepBlock):
         )
         self.out_layers = nn.Sequential(
             normalization(self.out_channels),
-            nn.SiLU(),
+            activation_function(),
             nn.Dropout(p=dropout),
             zero_module(
                 conv_nd(dims, self.out_channels, self.out_channels, 3, padding=1)
@@ -536,6 +537,7 @@ class UNetModel_v1preview(nn.Module):
         resblock_updown=False,
         use_new_attention_order=False,
         high_way = True,
+        activation_function = nn.SiLU,
     ):
         super().__init__()
 
@@ -561,7 +563,7 @@ class UNetModel_v1preview(nn.Module):
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
             linear(model_channels, time_embed_dim),
-            nn.SiLU(),
+            activation_function(),
             linear(time_embed_dim, time_embed_dim),
         )
 
@@ -592,6 +594,7 @@ class UNetModel_v1preview(nn.Module):
                         dims=dims,
                         use_checkpoint=use_checkpoint,
                         use_scale_shift_norm=use_scale_shift_norm,
+                        activation_function = activation_function,
                     )
                 ]
                 ch = mult * model_channels
@@ -623,6 +626,7 @@ class UNetModel_v1preview(nn.Module):
                             use_checkpoint=use_checkpoint,
                             use_scale_shift_norm=use_scale_shift_norm,
                             down=True,
+                            activation_function = activation_function,
                         )
                         if resblock_updown
                         else Downsample(
@@ -644,6 +648,7 @@ class UNetModel_v1preview(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
             AttentionBlock(
                 ch,
@@ -659,6 +664,7 @@ class UNetModel_v1preview(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
         )
         self._feature_size += ch
@@ -676,6 +682,7 @@ class UNetModel_v1preview(nn.Module):
                         dims=dims,
                         use_checkpoint=use_checkpoint,
                         use_scale_shift_norm=use_scale_shift_norm,
+                        activation_function = activation_function,
                     )
                 ]
                 ch = model_channels * mult
@@ -701,6 +708,7 @@ class UNetModel_v1preview(nn.Module):
                             use_checkpoint=use_checkpoint,
                             use_scale_shift_norm=use_scale_shift_norm,
                             up=True,
+                            activation_function = activation_function,
                         )
                         if resblock_updown
                         else Upsample(ch, conv_resample, dims=dims, out_channels=out_ch)
@@ -711,7 +719,7 @@ class UNetModel_v1preview(nn.Module):
 
         self.out = nn.Sequential(
             normalization(ch),
-            nn.SiLU(),
+            activation_function(),
             zero_module(conv_nd(dims, model_channels , out_channels, 3, padding=1)),
         )
 
@@ -845,6 +853,7 @@ class UNetModel_newpreview(nn.Module):
         resblock_updown=False,
         use_new_attention_order=False,
         high_way = True,
+        activation_function = nn.SiLU,
     ):
         super().__init__()
 
@@ -870,7 +879,7 @@ class UNetModel_newpreview(nn.Module):
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
             linear(model_channels, time_embed_dim),
-            nn.SiLU(),
+            activation_function(),
             linear(time_embed_dim, time_embed_dim),
         )
 
@@ -901,6 +910,7 @@ class UNetModel_newpreview(nn.Module):
                         dims=dims,
                         use_checkpoint=use_checkpoint,
                         use_scale_shift_norm=use_scale_shift_norm,
+                        activation_function = activation_function,
                     )
                 ]
                 ch = mult * model_channels
@@ -932,6 +942,7 @@ class UNetModel_newpreview(nn.Module):
                             use_checkpoint=use_checkpoint,
                             use_scale_shift_norm=use_scale_shift_norm,
                             down=True,
+                            activation_function = activation_function,
                         )
                         if resblock_updown
                         else Downsample(
@@ -953,6 +964,7 @@ class UNetModel_newpreview(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
             AttentionBlock(
                 ch,
@@ -968,6 +980,7 @@ class UNetModel_newpreview(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
         )
         self._feature_size += ch
@@ -985,6 +998,7 @@ class UNetModel_newpreview(nn.Module):
                         dims=dims,
                         use_checkpoint=use_checkpoint,
                         use_scale_shift_norm=use_scale_shift_norm,
+                        activation_function = activation_function,
                     )
                 ]
                 ch = model_channels * mult
@@ -1010,6 +1024,7 @@ class UNetModel_newpreview(nn.Module):
                             use_checkpoint=use_checkpoint,
                             use_scale_shift_norm=use_scale_shift_norm,
                             up=True,
+                            activation_function = activation_function,
                         )
                         if resblock_updown
                         else Upsample(ch, conv_resample, dims=dims, out_channels=out_ch)
@@ -1020,7 +1035,7 @@ class UNetModel_newpreview(nn.Module):
 
         self.out = nn.Sequential(
             normalization(ch),
-            nn.SiLU(),
+            activation_function(),
             zero_module(conv_nd(dims, model_channels , out_channels, 3, padding=1)),
         )
 
@@ -1150,6 +1165,7 @@ class EncoderUNetModel(nn.Module):
         resblock_updown=False,
         use_new_attention_order=False,
         pool="adaptive",
+        activation_function = nn.SiLU,
     ):
         super().__init__()
 
@@ -1173,7 +1189,7 @@ class EncoderUNetModel(nn.Module):
         time_embed_dim = model_channels * 4
         self.time_embed = nn.Sequential(
             linear(model_channels, time_embed_dim),
-            nn.SiLU(),
+            activation_function(),
             linear(time_embed_dim, time_embed_dim),
         )
 
@@ -1199,6 +1215,7 @@ class EncoderUNetModel(nn.Module):
                         dims=dims,
                         use_checkpoint=use_checkpoint,
                         use_scale_shift_norm=use_scale_shift_norm,
+                        activation_function = activation_function,
                     )
                 ]
                 ch = mult * model_channels
@@ -1228,6 +1245,7 @@ class EncoderUNetModel(nn.Module):
                             use_checkpoint=use_checkpoint,
                             use_scale_shift_norm=use_scale_shift_norm,
                             down=True,
+                            activation_function = activation_function,
                         )
                         if resblock_updown
                         else Downsample(
@@ -1248,6 +1266,7 @@ class EncoderUNetModel(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
             AttentionBlock(
                 ch,
@@ -1263,6 +1282,7 @@ class EncoderUNetModel(nn.Module):
                 dims=dims,
                 use_checkpoint=use_checkpoint,
                 use_scale_shift_norm=use_scale_shift_norm,
+                activation_function = activation_function,
             ),
         )
         self._feature_size += ch
@@ -1273,7 +1293,7 @@ class EncoderUNetModel(nn.Module):
         if pool == "adaptive":
             self.out = nn.Sequential(
                 normalization(ch),
-                nn.SiLU(),
+                activation_function(),
                 nn.AdaptiveAvgPool2d((1, 1)),
                 zero_module(conv_nd(dims, ch, out_channels, 1)),
                 nn.Flatten(),
@@ -1282,7 +1302,7 @@ class EncoderUNetModel(nn.Module):
             assert num_head_channels != -1
             self.out = nn.Sequential(
                 normalization(ch),
-                nn.SiLU(),
+                activation_function(),
                 AttentionPool2d(
                     (image_size // ds), ch, num_head_channels, out_channels
                 ),
@@ -1294,7 +1314,7 @@ class EncoderUNetModel(nn.Module):
             self.out = nn.Sequential(
                 nn.Linear(self._feature_size, 2048),
                 normalization(2048),
-                nn.SiLU(),
+                activation_function(),
                 nn.Linear(2048, self.out_channels),
             )
         else:
