@@ -1,6 +1,7 @@
 import argparse
 import inspect
 import torch.nn as nn
+from .utils import sigmoid_helper
 
 from . import gaussian_diffusion as gd
 from .respace import SpacedDiffusion, space_timesteps
@@ -65,6 +66,7 @@ def model_and_diffusion_defaults():
         dpm_solver = False,
         version = 'new',
         activation_function = nn.SiLU,
+        final_nonlin = sigmoid_helper,
     )
     res.update(diffusion_defaults())
     return res
@@ -104,6 +106,7 @@ def create_model_and_diffusion(
     dpm_solver,
     version,
     activation_function,
+    final_nonlin,
 ):
     model = create_model(
         image_size,
@@ -125,6 +128,7 @@ def create_model_and_diffusion(
         use_new_attention_order=use_new_attention_order,
         version = version,
         activation_function = activation_function,
+        final_nonlin = final_nonlin,
     )
     diffusion = create_gaussian_diffusion(
         steps=diffusion_steps,
@@ -160,6 +164,7 @@ def create_model(
     use_new_attention_order=False,
     version = 'new',
     activation_function = nn.SiLU,
+    final_nonlin = sigmoid_helper,
 ):
     if channel_mult == "":
         if image_size == 512:
@@ -198,6 +203,7 @@ def create_model(
         resblock_updown=resblock_updown,
         use_new_attention_order=use_new_attention_order,
         activation_function=activation_function,
+        final_nonlin=final_nonlin,
     ) if version == 'new' else UNetModel_v1preview(
         image_size=image_size,
         in_channels=in_ch,
@@ -217,6 +223,7 @@ def create_model(
         resblock_updown=resblock_updown,
         use_new_attention_order=use_new_attention_order,
         activation_function=activation_function,
+        final_nonlin=final_nonlin,
     )
     
 
