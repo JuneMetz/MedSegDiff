@@ -1,5 +1,6 @@
 import argparse
 import inspect
+import torch.nn as nn
 
 from . import gaussian_diffusion as gd
 from .respace import SpacedDiffusion, space_timesteps
