@@ -101,6 +101,7 @@ def create_model_and_diffusion(
     use_new_attention_order,
     dpm_solver,
     version,
+    activation_function,
 ):
     model = create_model(
         image_size,
@@ -121,6 +122,7 @@ def create_model_and_diffusion(
         use_fp16=use_fp16,
         use_new_attention_order=use_new_attention_order,
         version = version,
+        activation_function = activation_function,
     )
     diffusion = create_gaussian_diffusion(
         steps=diffusion_steps,
@@ -155,6 +157,7 @@ def create_model(
     use_fp16=False,
     use_new_attention_order=False,
     version = 'new',
+    activation_function = nn.SiLU,
 ):
     if channel_mult == "":
         if image_size == 512:
@@ -192,6 +195,7 @@ def create_model(
         use_scale_shift_norm=use_scale_shift_norm,
         resblock_updown=resblock_updown,
         use_new_attention_order=use_new_attention_order,
+        activation_function=activation_function,
     ) if version == 'new' else UNetModel_v1preview(
         image_size=image_size,
         in_channels=in_ch,
@@ -210,6 +214,7 @@ def create_model(
         use_scale_shift_norm=use_scale_shift_norm,
         resblock_updown=resblock_updown,
         use_new_attention_order=use_new_attention_order,
+        activation_function=activation_function,
     )
     
 
